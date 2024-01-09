@@ -1,22 +1,112 @@
+import Button from "@/components/button";
+import api from "@/services/axios";
+import { useFormik } from "formik";
+
 import Link from "next/link";
+import React, { CSSProperties, useState } from "react";
+
+const validate = (values: any) => {
+  const errors: any = {};
+
+  if (!values.identifier) {
+    errors.identifier = "Required email or username";
+  } else if (values.identifier.length < 2) {
+    errors.identifier = "Must be 2 characters or more";
+  }
+
+  if (!values.password) {
+    errors.password = "Required password";
+  } else if (values.password.length < 3) {
+    errors.password = "Must be 3 characters or more";
+  }
+
+  return errors;
+};
 
 export default function Login() {
+  // const [identifier, setIdentifier] = useState("");
+  // const [password, setPassword] = useState("");
+  const [errorIdentifier, setErrorIndentifier] = useState(false);
+  const [errorPassword, setErrorPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const override: CSSProperties = {
+    display: "block",
+    margin: "0 auto",
+    borderColor: "red",
+  };
+
+  const loginForm = useFormik({
+    initialValues: {
+      identifier: "",
+      password: "",
+    },
+    validate,
+    onSubmit: (values) => {
+      console.log("onsubmit");
+      handleLogin(values);
+    },
+  });
+
+  const handleLogin = async (value: {
+    identifier: string;
+    password: string;
+  }) => {
+    // e.preventDefault();
+    const dataForm = value;
+    setLoading(true);
+
+    console.log(dataForm);
+
+    try {
+      const respone = await api.put("auth/login", dataForm);
+      console.log(respone);
+    } catch (err) {
+      setErrorIndentifier(true);
+      setErrorPassword(true);
+      console.log(err, "erororororo");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden">
       <div className="w-full p-6 bg-white rounded-md shadow-md lg:max-w-xl">
-        <h1 className="text-3xl font-bold text-center text-gray-700">Logo</h1>
-        <form className="mt-6">
+        <h1 className="text-3xl font-bold text-center text-gray-700">Login</h1>
+        <form className="mt-6" onSubmit={loginForm.handleSubmit}>
           <div className="mb-4">
             <label
-              htmlFor="email"
+              htmlFor="identifier"
               className="block text-sm font-semibold text-gray-800"
             >
-              Email
+              Email or Username
             </label>
             <input
-              type="email"
-              className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring focus:ring-opacity-40"
+              id="identifier"
+              name="identifier"
+              type="text"
+              value={loginForm.values.identifier}
+              placeholder="type your email or username"
+              onChange={loginForm.handleChange}
+              // onBlur={loginForm.handleBlur}
+              className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring focus:ring-opacity-40 ${
+                errorIdentifier ? "border-red-500" : ""
+              }`}
             />
+            {errorIdentifier ? (
+              <div className="text-red-500 text-sm">
+                *Invalid email or username
+              </div>
+            ) : (
+              ""
+            )}
+            {loginForm.touched.identifier && loginForm.errors.identifier ? (
+              <div className="text-red-500 text-sm">
+                *{loginForm.errors.identifier}
+              </div>
+            ) : (
+              ""
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -26,9 +116,30 @@ export default function Login() {
               Password
             </label>
             <input
+              id="password"
+              name="password"
               type="password"
-              className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring focus:ring-opacity-40"
+              placeholder="type your password"
+              value={loginForm.values.password}
+              onChange={loginForm.handleChange}
+              // onBlur={loginForm.handleBlur}
+              className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring focus:ring-opacity-40 ${
+                errorPassword ? "border-red-500" : ""
+              }`}
             />
+            {errorPassword ? (
+              <div className="text-red-500 text-sm">*Invalid password</div>
+            ) : (
+              ""
+            )}
+
+            {loginForm.touched.password && loginForm.errors.password ? (
+              <div className="text-red-500 text-sm">
+                *{loginForm.errors.password}
+              </div>
+            ) : (
+              ""
+            )}
           </div>
           <Link
             href="/forget"
@@ -37,14 +148,19 @@ export default function Login() {
             Forget Password?
           </Link>
           <div className="mt-2">
-            <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600">
-              Sign In
-            </button>
+            <Button
+              // onClick={handleLogin}
+              type="submit"
+              className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
+              children="Sign In"
+              disabled={loading}
+              loading={loading}
+            ></Button>
           </div>
         </form>
 
         <div className="relative flex items-center justify-center w-full mt-6 border border-t">
-          <div className="absolute px-5 bg-white">Or</div>
+          <div className="absolute px-5 bg-white text-gray-600">or</div>
         </div>
         <div className="flex mt-4 gap-x-2">
           <button
