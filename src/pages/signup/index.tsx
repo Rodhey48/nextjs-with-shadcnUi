@@ -5,82 +5,19 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import api from "@/services/axios";
-import { useFormik } from "formik";
-
+} from "@radix-ui/react-tooltip";
 import Link from "next/link";
-import React, { CSSProperties, useState } from "react";
+import { useState } from "react";
 
-const validate = (values: any) => {
-  const errors: any = {};
-
-  if (!values.identifier) {
-    errors.identifier = "Required email or username";
-  } else if (values.identifier.length < 2) {
-    errors.identifier = "Must be 2 characters or more";
-  }
-
-  if (!values.password) {
-    errors.password = "Required password";
-  } else if (values.password.length < 3) {
-    errors.password = "Must be 3 characters or more";
-  }
-
-  return errors;
-};
-
-export default function Login() {
-  // const [identifier, setIdentifier] = useState("");
-  // const [password, setPassword] = useState("");
-  const [errorIdentifier, setErrorIndentifier] = useState(false);
-  const [errorPassword, setErrorPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-
+export default function signup() {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
-
-  const override: CSSProperties = {
-    display: "block",
-    margin: "0 auto",
-    borderColor: "red",
-  };
-
-  const loginForm = useFormik({
-    initialValues: {
-      identifier: "",
-      password: "",
-    },
-    validate,
-    onSubmit: (values) => {
-      console.log("onsubmit");
-      handleLogin(values);
-    },
-  });
-
-  const handleLogin = async (value: {
-    identifier: string;
-    password: string;
-  }) => {
-    // e.preventDefault();
-    const dataForm = value;
-    setLoading(true);
-
-    console.log(dataForm);
-
-    try {
-      const respone = await api.put("auth/login", dataForm);
-      console.log(respone);
-    } catch (err) {
-      setErrorIndentifier(true);
-      setErrorPassword(true);
-      console.log(err, "erororororo");
-    } finally {
-      setLoading(false);
-    }
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword((prevShowPassword) => !prevShowPassword);
   };
   return (
     <div>
@@ -90,44 +27,56 @@ export default function Login() {
       <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden">
         <div className="w-full p-6 bg-slate-100 rounded-md shadow-md lg:max-w-xl">
           <h1 className="text-3xl font-bold text-center text-gray-700">
-            Login
+            Register
           </h1>
-          <form className="mt-6" onSubmit={loginForm.handleSubmit}>
+          <form className="mt-6">
             <div className="mb-4">
               <label
-                htmlFor="identifier"
+                htmlFor="name"
                 className="block text-sm font-semibold text-gray-800"
               >
-                Email or Username
+                Your Name
               </label>
               <input
-                id="identifier"
-                name="identifier"
                 type="text"
-                value={loginForm.values.identifier}
-                placeholder="type your email or username"
-                onChange={loginForm.handleChange}
-                onBlur={loginForm.handleBlur}
-                className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring focus:ring-opacity-40 placeholder-sm ${
-                  errorIdentifier ? "border-red-500" : ""
-                }`}
+                id="name"
+                name="name"
+                placeholder="type your name"
+                className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring-opacity-40 placeholder-sm`}
               />
-              {errorIdentifier ? (
-                <div className="text-red-500 text-xs">
-                  *Invalid email or username
-                </div>
-              ) : (
-                ""
-              )}
-              {loginForm.touched.identifier && loginForm.errors.identifier ? (
-                <div className="text-red-500 text-xs">
-                  *{loginForm.errors.identifier}
-                </div>
-              ) : (
-                ""
-              )}
             </div>
-            <div className="mb-2">
+
+            <div className="mb-4">
+              <label
+                htmlFor="email"
+                className="block text-sm font-semibold text-gray-800"
+              >
+                Your Email
+              </label>
+              <input
+                type="text"
+                id="email"
+                name="email"
+                placeholder="type your mail"
+                className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring-opacity-40 placeholder-sm`}
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="username"
+                className="block text-sm font-semibold text-gray-800"
+              >
+                Pick your username
+              </label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="type your username"
+                className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring-opacity-40 placeholder-sm`}
+              />
+            </div>
+            <div className="mb-4">
               <label
                 htmlFor="password"
                 className="block text-sm font-semibold text-gray-800"
@@ -136,16 +85,11 @@ export default function Login() {
               </label>
               <div className="relative">
                 <input
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   name="password"
-                  type={showPassword ? "text" : "password"}
                   placeholder="type your password"
-                  value={loginForm.values.password}
-                  onChange={loginForm.handleChange}
-                  onBlur={loginForm.handleBlur}
-                  className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring focus:ring-opacity-40 placeholder-sm ${
-                    errorPassword ? "border-red-500" : ""
-                  }`}
+                  className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring-opacity-40 placeholder-sm`}
                 />
                 <button
                   type="button"
@@ -190,42 +134,81 @@ export default function Login() {
                   )}
                 </button>
               </div>
-              {errorPassword ? (
-                <div className="text-red-500 text-xs">*Invalid password</div>
-              ) : (
-                ""
-              )}
-
-              {loginForm.touched.password && loginForm.errors.password ? (
-                <div className="text-red-500 text-xs">
-                  *{loginForm.errors.password}
-                </div>
-              ) : (
-                ""
-              )}
             </div>
-            <Link
-              href="/forget"
-              className="text-xs text-blue-600 hover:underline"
-            >
-              Forget Password?
-            </Link>
+            <div className="mb-4">
+              <label
+                htmlFor="password"
+                className="block text-sm font-semibold text-gray-800"
+              >
+                Confirm your password
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  placeholder="type your password"
+                  className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring-opacity-40 placeholder-sm`}
+                />
+                <button
+                  type="button"
+                  onClick={toggleConfirmPasswordVisibility}
+                  className="absolute right-0 top-0 mt-3 mr-3 cursor-pointer"
+                >
+                  {showConfirmPassword ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      className="w-6 h-6 text-blue-500"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      className="w-6 h-6  text-blue-200"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
             <div className="mt-2">
               <Button
                 // onClick={handleLogin}
                 type="submit"
                 className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
-                children="Sign In"
-                disabled={loading}
-                loading={loading}
+                children="Sign Up"
               ></Button>
             </div>
           </form>
-
           <div className="flex items-center justify-center w-full mt-6 ">
-            <div className="border border-t-2 w-3/4 border-gray-300"></div>
-            <div className=" p-2 text-sm text-gray-700">or</div>
-            <div className="border border-t-2 w-3/4 border-gray-300"></div>
+            <div className="border border-t-2 w-2/3 border-gray-300"></div>
+            <div className=" p-2 text-sm text-center w-1/2 text-gray-700">
+              or sign up with
+            </div>
+            <div className="border border-t-2 w-2/3 border-gray-300"></div>
           </div>
           <div className="flex mt-4 gap-x-2">
             <TooltipProvider>
@@ -293,12 +276,12 @@ export default function Login() {
             </TooltipProvider>
           </div>
           <p className="mt-4 text-sm text-center text-gray-700">
-            Don't have an account?{" "}
+            You already have an account?{" "}
             <Link
-              href="/signup"
+              href="/login"
               className="font-medium text-blue-600 hover:underline"
             >
-              Sign up
+              Sign in
             </Link>
           </p>
         </div>
